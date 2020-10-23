@@ -1,8 +1,9 @@
-import pygame, sys, random
-import pandas as pd
-from time import sleep
-from pygame.locals import *
 from timeit import default_timer as timer
+
+import pandas as pd
+import pygame
+import random
+import sys
 
 fps = 30
 pygame.init()
@@ -17,11 +18,28 @@ lightblue = (126, 178, 255)
 darklightblue = (42, 129, 255)
 lightgrey = (192, 192, 192)
 
+largeText = pygame.font.SysFont("freesansbold.ttf", 115)
+mediumText = pygame.font.SysFont("freesansbold.ttf", 70)
+text40 = pygame.font.Font('freesansbold.ttf', 40)
+text20 = pygame.font.Font('freesansbold.ttf', 20)
+
 textBoxSpace = 5
 textBoxNumber = 0
 
 
 def button(word, x, y, w, h, ic, ac, action=None):
+    """
+    function that creates buttons
+    :param word: label of the button
+    :param x: position on x
+    :param y: position on y
+    :param w: width of the button
+    :param h: height of the button
+    :param ic: color
+    :param ac: color when mouse on the button
+    :param action: function of the button
+    :return:
+    """
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
 
@@ -33,13 +51,16 @@ def button(word, x, y, w, h, ic, ac, action=None):
         pygame.draw.rect(screen, ic, (x, y, w, h))
 
     buttonText = pygame.font.Font("freesansbold.ttf", 20)
-    buttonTextSurf = buttonText.render(word, True, white)
-    buttonTextRect = buttonTextSurf.get_rect()
+    buttonTextSurf, buttonTextRect = textObjects(word, buttonText, white)
     buttonTextRect.center = ((x + (w / 2)), (y + (h / 2)))
     screen.blit(buttonTextSurf, buttonTextRect)
 
 
 def endGame():
+    """
+    End screen of the game
+    :return:
+    """
     global textBoxSpace, textBoxNumber, end, start
     end = timer()
     print("Temps: ", end - start)
@@ -59,39 +80,46 @@ def endGame():
         button("Oui", (width / 2) - 50, 420, 100, 50, darklightred, lightred, quitGame)
         button("Non", (width / 2) - 50, 500, 100, 50, darklightred, lightred, hangman)
 
-        largeText = pygame.font.SysFont("freesansbold.ttf", 115)
-        mediumText = pygame.font.SysFont("freesansbold.ttf", 70)
-        TextSurf = mediumText.render("Arreter de jouer?", True, darklightred)
-        TextRect = TextSurf.get_rect()
+        TextSurf, TextRect = textObjects("Arreter de jouer?", mediumText, darklightred)
         TextRect.center = (width / 2, height / 1.6)
         screen.blit(TextSurf, TextRect)
 
-        TextSurf = mediumText.render(("Le mot etait " + pick + "!"), True, darklightblue)
-        TextRect = TextSurf.get_rect()
+        TextSurf, TextRect = textObjects(("Le mot etait " + pick + "!"), mediumText, darklightblue)
         TextRect.center = (width / 2, height / 2)
         screen.blit(TextSurf, TextRect)
 
-        textSurf = largeText.render(message, True, darklightred)
-        textRect = textSurf.get_rect()
-        textRect.center = (width / 2, 200)
-        screen.blit(textSurf, textRect)
+        TextSurf, TextRect = textObjects(message, largeText, darklightred)
+        TextRect.center = (width / 2, 200)
+        screen.blit(TextSurf, TextRect)
 
         pygame.display.update()
         clock.tick(fps)
 
 
 def quitGame():
+    """
+    Quitting game function
+    :return:
+    """
     pygame.quit()
     sys.exit()
 
 
 def unpause():
+    """
+    End of pause function
+    :return:
+    """
     global pause
     screen.fill(white)
     pause = False
 
 
-def thepause():
+def pause():
+    """
+    Pause in game function
+    :return:
+    """
     global pause
     while pause:
         for event in pygame.event.get():
@@ -100,9 +128,7 @@ def thepause():
                 sys.exit()
 
         screen.fill(white)
-        largeText = pygame.font.SysFont("freesansbold.ttf", 115)
-        TextSurf = largeText.render("Pause", True, black)
-        TextRect = TextSurf.get_rect()
+        TextSurf, TextRect = textObjects("Pause", largeText, black)
         TextRect.center = (width / 2, height / 2)
         screen.blit(TextSurf, TextRect)
 
@@ -114,8 +140,8 @@ def thepause():
     screen.fill(white)
 
 
-def textObjects(text, font):
-    textSurface = font.render(text, True, black)
+def textObjects(text, font, color):
+    textSurface = font.render(text, True, color)
     return textSurface, textSurface.get_rect()
 
 
@@ -135,12 +161,10 @@ def placeLetter(letter):
     space = 10
     wordSpace = 0
     while wordSpace < len(pick):
-        text = pygame.font.Font('freesansbold.ttf', 40)
         if letter in pickSplit[wordSpace]:
-            textSurf = text.render(letter, True, black)
-            textRect = textSurf.get_rect()
-            textRect.center = (((150) + space), (200))
-            screen.blit(textSurf, textRect)
+            TextSurf, TextRect = textObjects(letter, text40, black)
+            TextRect.center = ((150 + space), 200)
+            screen.blit(TextSurf, TextRect)
         wordSpace += 1
         space += 60
 
@@ -151,32 +175,24 @@ def placeLetter(letter):
 def textBoxLetter(letter):
     global textBoxSpace, textBoxNumber
     if textBoxNumber <= 5:
-        text = pygame.font.Font("freesansbold.ttf", 40)
-        textSurf = text.render(letter, True, black)
-        textRect = textSurf.get_rect()
-        textRect.center = (((105) + textBoxSpace), (350))
-        screen.blit(textSurf, textRect)
+        TextSurf, TextRect = textObjects(letter, text40, black)
+        TextRect.center = ((105 + textBoxSpace), 350)
+        screen.blit(TextSurf, TextRect)
 
     elif textBoxNumber <= 10:
-        text = pygame.font.Font("freesansbold.ttf", 40)
-        textSurf = text.render(letter, True, black)
-        textRect = textSurf.get_rect()
-        textRect.center = (((105) + textBoxSpace), (400))
-        screen.blit(textSurf, textRect)
+        TextSurf, TextRect = textObjects(letter, text40, black)
+        TextRect.center = ((105 + textBoxSpace), 400)
+        screen.blit(TextSurf, TextRect)
 
     elif textBoxNumber <= 15:
-        text = pygame.font.Font("freesansbold.ttf", 40)
-        textSurf = text.render(letter, True, black)
-        textRect = textSurf.get_rect()
-        textRect.center = (((105) + textBoxSpace), (450))
-        screen.blit(textSurf, textRect)
+        TextSurf, TextRect = textObjects(letter, text40, black)
+        TextRect.center = ((105 + textBoxSpace), 450)
+        screen.blit(TextSurf, TextRect)
 
     elif textBoxNumber <= 20:
-        text = pygame.font.Font("freesansbold.ttf", 40)
-        textSurf = text.render(letter, True, black)
-        textRect = textSurf.get_rect()
-        textRect.center = (((105) + textBoxSpace), (500))
-        screen.blit(textSurf, textRect)
+        TextSurf, TextRect = textObjects(letter, text40, black)
+        TextRect.center = ((105 + textBoxSpace), 500)
+        screen.blit(TextSurf, TextRect)
 
     pygame.display.update()
     clock.tick(fps)
@@ -196,11 +212,9 @@ def hangman():
         space = 10
         textBoxSpace = 5
 
-        text = pygame.font.Font("freesansbold.ttf", 20)
-        textSurf = text.render("Choisir la catégorie", True, black)
-        textRect = textSurf.get_rect()
-        textRect.center = ((width / 2), (height / 2))
-        screen.blit(textSurf, textRect)
+        TextSurf, TextRect = textObjects("Choisir la catégorie", text20, black)
+        TextRect.center = ((width / 2), (height / 2))
+        screen.blit(TextSurf, TextRect)
 
         button("Animaux", 150, 450, 150, 100, black, lightgrey, Animals)
         button("Transports", 550, 450, 150, 100, black, lightgrey, Vehicles)
@@ -223,7 +237,6 @@ def hangmanGame(category, title):
     wordSpace = 0
     space = 10
 
-
     guesses = ''
     gamePlay = True
     while gamePlay == True:
@@ -237,26 +250,20 @@ def hangmanGame(category, title):
             textBoxSpace = 5
 
         while wordSpace < len(pick):
-            text = pygame.font.Font("freesansbold.ttf", 40)
-            letterBox_surf = text.render("_", True, black)
-            letterBox_rect = letterBox_surf.get_rect()
-            letterBox_rect.center = (((150) + space), (200))
+            letterBox_surf, letterBox_rect = textObjects("_", text40, black)
+            letterBox_rect.center = ((150 + space), 200)
             screen.blit(letterBox_surf, letterBox_rect)
             space = space + 60
             wordSpace += 1
 
         pygame.draw.rect(screen, white, [550, 20, 200, 20])
-        text = pygame.font.Font("freesansbold.ttf", 20)
-        textSurf = text.render(("Chances: %s" % chances), False, black)
-        textRect = textSurf.get_rect()
-        textRect.topright = (700, 20)
-        screen.blit(textSurf, textRect)
+        TextSurf, TextRect = textObjects(("Chances: %s" % chances), text20, black)
+        TextRect.topright = (700, 20)
+        screen.blit(TextSurf, TextRect)
 
-        textTitle = pygame.font.Font("freesansbold.ttf", 40)
-        textTitleSurf = textTitle.render(title, True, black)
-        textTitleRect = textTitleSurf.get_rect()
-        textTitleRect.center = ((width / 2), 50)
-        screen.blit(textTitleSurf, textTitleRect)
+        TextTitleSurf, TextTitleRect = textObjects(title, text40, black)
+        TextTitleRect.center = ((width / 2), 50)
+        screen.blit(TextTitleSurf, TextTitleRect)
 
         pygame.draw.rect(screen, black, [100, 300, 250, 250], 2)
 
@@ -308,195 +315,130 @@ def hangmanGame(category, title):
 
             if event.type == pygame.KEYDOWN:
                 failed = 0
-                print("Perdu", failed)
-                print("Chance", chances)
 
                 if event.key == pygame.K_SPACE:
-                    thepause()
+                    pause()
 
                 if event.key == pygame.K_ESCAPE:
                     gamePlay = False
 
                 if event.key == pygame.K_a:
-                    # letter a
+                    # lettre q
                     guessLett = guessLett + 'q'
                     guesses += guessLett
-                    print("Lettre a trouvée")
-                    print("")
                     for char in pick:
-                        if char in guesses:
-                            print(char)
-                        else:
-                            print("_")
+                        if char not in guesses:
                             failed += 1
 
                     if guessLett in pick:
                         placeLetter('q')
 
                     if failed == 0:
-                        print("Vous l'avez!")
-                        print(pick)
                         endGame()
 
                     if guessLett not in pick:
                         textBoxSpace += 40
                         textBoxNumber += 1
                         chances = chances - 1
-                        print("")
-                        print(textBoxNumber)
-                        print("")
-                        print("Cette lettre n'est pas dedans")
                         textBoxLetter('q')
 
                     if chances == 0:
-                        print("Perdu!")
-                        print("Le mot etait: ", pick)
                         endGame()
 
                 if event.key == pygame.K_b:
-                    # letter b
+                    # lettre b
                     guessLett = guessLett + 'b'
                     guesses += guessLett
-                    print("letter b guessed")
-                    print("")
                     for char in pick:
-                        if char in guesses:
-                            print(char)
-                        else:
-                            print("_")
+                        if char not in guesses:
                             failed += 1
 
                     if guessLett in pick:
                         placeLetter('b')
 
                     if failed == 0:
-                        print("You got the word")
-                        print(pick)
                         endGame()
 
                     if guessLett not in pick:
                         textBoxSpace += 40
                         textBoxNumber += 1
                         chances = chances - 1
-                        print("")
-                        print("That letter is not in the word")
                         textBoxLetter('b')
 
                     if chances == 0:
-                        print("Sorry you have lost")
-                        print("The word was", pick)
                         endGame()
 
                 if event.key == pygame.K_c:
-                    # letter c
+                    # lettre c
                     guessLett = guessLett + 'c'
                     guesses += guessLett
-                    print("letter c guessed")
-                    print("")
                     for char in pick:
-                        if char in guesses:
-                            print(char)
-                        else:
-                            print("_")
+                        if char not in guesses:
                             failed += 1
 
                     if guessLett in pick:
                         placeLetter('c')
 
                     if failed == 0:
-                        print("You got the word")
-                        print(pick)
                         endGame()
 
                     if guessLett not in pick:
                         textBoxSpace += 40
                         textBoxNumber += 1
                         chances = chances - 1
-                        print("")
-                        print(textBoxNumber)
-                        print("")
-                        print("That letter is not in the word")
                         textBoxLetter('c')
 
                     if chances == 0:
-                        print("Sorry you have lost")
-                        print("The word was", pick)
                         endGame()
 
                 if event.key == pygame.K_d:
-                    # letter d
+                    # lettre d
                     guessLett = guessLett + 'd'
                     guesses += guessLett
-                    print("letter d guessed")
-                    print("")
                     for char in pick:
-                        if char in guesses:
-                            print(char)
-                        else:
-                            print("_")
+                        if char not in guesses:
                             failed += 1
 
                     if guessLett in pick:
                         placeLetter('d')
 
                     if failed == 0:
-                        print("You got the word")
-                        print(pick)
                         endGame()
 
                     if guessLett not in pick:
                         textBoxSpace += 40
                         textBoxNumber += 1
                         chances = chances - 1
-                        print("")
-                        print(textBoxNumber)
-                        print("")
-                        print("That letter is not in the word")
                         textBoxLetter('d')
 
                     if chances == 0:
-                        print("Sorry you have lost")
-                        print("The word was", pick)
                         endGame()
 
                 if event.key == pygame.K_e:
-                    # letter e
+                    # lettre e
                     guessLett = guessLett + 'e'
                     guesses += guessLett
-                    print("letter e guessed")
-                    print("")
                     for char in pick:
-                        if char in guesses:
-                            print(char)
-                        else:
-                            print("_")
+                        if char not in guesses:
                             failed += 1
 
                     if guessLett in pick:
                         placeLetter('e')
 
                     if failed == 0:
-                        print("You got the word")
-                        print(pick)
                         endGame()
 
                     if guessLett not in pick:
                         textBoxSpace += 40
                         textBoxNumber += 1
                         chances = chances - 1
-                        print("")
-                        print(textBoxNumber)
-                        print("")
-                        print("That letter is not in the word")
                         textBoxLetter('e')
 
                     if chances == 0:
-                        print("Sorry you have lost")
-                        print("The word was", pick)
                         endGame()
 
                 if event.key == pygame.K_f:
-                    # letter f
+                    # lettre f
                     guessLett = guessLett + 'f'
                     guesses += guessLett
                     print("letter f guessed")
@@ -1252,6 +1194,59 @@ def hangmanGame(category, title):
                         print("Sorry you have lost")
                         print("The word was", pick)
                         endGame()
+
+                if event.key == pygame.K_z:
+                    letter = 'a'
+                if event.key == pygame.K_z:
+                    letter = 'b'
+                if event.key == pygame.K_z:
+                    letter = 'c'
+                if event.key == pygame.K_z:
+                    letter = 'd'
+                if event.key == pygame.K_z:
+                    letter = 'e'
+                if event.key == pygame.K_z:
+                    letter = 'f'
+                if event.key == pygame.K_z:
+                    letter = 'g'
+                if event.key == pygame.K_z:
+                    letter = 'h'
+                if event.key == pygame.K_z:
+                    letter = 'i'
+                if event.key == pygame.K_z:
+                    letter = 'j'
+                if event.key == pygame.K_z:
+                    letter = 'k'
+                if event.key == pygame.K_z:
+                    letter = 'l'
+                if event.key == pygame.K_z:
+                    letter = 'm'
+                if event.key == pygame.K_z:
+                    letter = 'n'
+                if event.key == pygame.K_z:
+                    letter = 'o'
+                if event.key == pygame.K_z:
+                    letter = 'p'
+                if event.key == pygame.K_z:
+                    letter = 'q'
+                if event.key == pygame.K_z:
+                    letter = 'r'
+                if event.key == pygame.K_z:
+                    letter = 's'
+                if event.key == pygame.K_z:
+                    letter = 't'
+                if event.key == pygame.K_z:
+                    letter = 'u'
+                if event.key == pygame.K_z:
+                    letter = 'v'
+                if event.key == pygame.K_z:
+                    letter = 'w'
+                if event.key == pygame.K_z:
+                    letter = 'x'
+                if event.key == pygame.K_z:
+                    letter = 'y'
+                if event.key == pygame.K_z:
+                    letter = 'z'
 
         pygame.display.update()
         clock.tick(fps)
